@@ -1,0 +1,70 @@
+[gd_scene load_steps=8 format=3 uid="uid://cl4hk7txg61hl"]
+
+[ext_resource type="Script" path="res://main.gd" id="1_5fhn4"]
+[ext_resource type="PackedScene" uid="uid://cprce1jdv3cno" path="res://player.tscn" id="1_k6cl6"]
+[ext_resource type="PackedScene" uid="uid://1j24y3pnc8c7" path="res://mob.tscn" id="2_tsro4"]
+[ext_resource type="PackedScene" uid="uid://c6tpagxip0s7m" path="res://hud.tscn" id="4_i2l1u"]
+[ext_resource type="AudioStream" uid="uid://dnqyc5v71pbbs" path="res://dodge_the_creeps_2d_assets/dodge_the_creeps_2d_assets/art/House In a Forest Loop.ogg" id="5_ayyt3"]
+[ext_resource type="AudioStream" uid="uid://dugkmjs2g7r85" path="res://dodge_the_creeps_2d_assets/dodge_the_creeps_2d_assets/art/gameover.wav" id="6_hx2ao"]
+
+[sub_resource type="Curve2D" id="Curve2D_s23g6"]
+_data = {
+"points": PackedVector2Array(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 480, 0, 0, 0, 0, 0, 480, 720, 0, 0, 0, 0, -8, 712, 0, 0, 0, 0, 0, 0)
+}
+point_count = 5
+
+[node name="Main" type="Node"]
+script = ExtResource("1_5fhn4")
+mob_scene = ExtResource("2_tsro4")
+
+[node name="MobTimer" type="Timer" parent="."]
+wait_time = 0.5
+
+[node name="ScoreTimer" type="Timer" parent="."]
+
+[node name="StartTimer" type="Timer" parent="."]
+wait_time = 2.0
+one_shot = true
+
+[node name="StartPosition" type="Marker2D" parent="."]
+position = Vector2(240, 337)
+
+[node name="MobPath" type="Path2D" parent="."]
+position = Vector2(9, -15)
+curve = SubResource("Curve2D_s23g6")
+
+[node name="MobSpawnLocation" type="PathFollow2D" parent="MobPath"]
+
+[node name="Music" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("5_ayyt3")
+parameters/looping = true
+
+[node name="DeathSound" type="AudioStreamPlayer" parent="."]
+stream = ExtResource("6_hx2ao")
+
+[node name="ColorRect" type="ColorRect" parent="."]
+show_behind_parent = true
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -2.0
+offset_top = 8.0
+offset_right = 8.0
+offset_bottom = 8.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0.284428, 0.284428, 1)
+
+[node name="Player" parent="." instance=ExtResource("1_k6cl6")]
+position = Vector2(232, 333)
+
+[node name="HUD" parent="." instance=ExtResource("4_i2l1u")]
+
+[node name="Mob" parent="." instance=ExtResource("2_tsro4")]
+position = Vector2(-15, 35)
+
+[connection signal="timeout" from="MobTimer" to="." method="_on_mob_timer_timeout"]
+[connection signal="timeout" from="ScoreTimer" to="." method="_on_score_timer_timeout"]
+[connection signal="timeout" from="StartTimer" to="." method="_on_start_timer_timeout"]
+[connection signal="hit" from="Player" to="." method="game_over"]
+[connection signal="start_game" from="HUD" to="." method="new_game"]
